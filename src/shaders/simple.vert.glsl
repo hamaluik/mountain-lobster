@@ -1,6 +1,7 @@
 attribute vec3 pos;
 
+uniform mat4 MVP;
+
 void kore() {
-	// Just output position
-	gl_Position = vec4(pos, 1.0);
+	gl_Position = MVP * vec4(pos, 1.0);
 }

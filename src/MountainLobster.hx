@@ -1,7 +1,10 @@
 package;
 
 import kha.arrays.Float32Array;
+import kha.graphics4.ConstantLocation;
 import kha.graphics4.Usage;
+import kha.math.FastMatrix4;
+import kha.math.FastVector3;
 import kha.Shaders;
 import kha.Framebuffer;
 import kha.graphics4.IndexBuffer;
@@ -24,6 +27,9 @@ class MountainLobster {
 	var vertexBuffer:VertexBuffer;
 	var indexBuffer:IndexBuffer;
 	var pipeline:PipelineState;
+
+	var mvp:FastMatrix4;
+	var mvpID:ConstantLocation;
 
 	public function new() {
 		// define the vertex structure
@@ -55,6 +61,23 @@ class MountainLobster {
 		}
 		indexBuffer.unlock();
 
+		// set up our camera
+		mvpID = pipeline.getConstantLocation("MVP");
+		var p = FastMatrix4.perspectiveProjection(45, 4/3, 0.1, 100);
+		var v = FastMatrix4.lookAt(
+			new FastVector3(4, 3, 3),
+			new FastVector3(0, 0, 0),
+			new FastVector3(0, 1, 0));
+		var m = FastMatrix4.identity();
+
+		mvp = FastMatrix4.identity();
+		mvp = mvp.multmat(p);
+		mvp = mvp.multmat(v);
+		mvp = mvp.multmat(m);
+
+		trace(mvpID);
+		trace(mvp);
+
 		// set up rendering and updates
 		System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
@@ -65,11 +88,15 @@ class MountainLobster {
 	function render(frame:Framebuffer):Void {
 		var g = frame.g4;
 		g.begin();
-		g.clear(Color.Black);
+		g.clear(Color.fromFloats(0.25, 0.25, 0.25));
 
-		g.setPipeline(pipeline);
 		g.setVertexBuffer(vertexBuffer);
 		g.setIndexBuffer(indexBuffer);
+
+		g.setPipeline(pipeline);
+
+		//g.setMatrix(mvpID, mvp);
+		g.setMatrix(mvpID, mvp);
 
 		g.drawIndexedVertices();
 
