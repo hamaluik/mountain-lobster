@@ -33,6 +33,7 @@ class MountainLobster {
 
 	var material:Material;
 	var camera:Camera;
+	var parent:Transform;
 	var transform:Transform;
 
 	var mvp:FastMatrix4;
@@ -68,10 +69,10 @@ class MountainLobster {
 		var m = FastMatrix4.identity();
 
 		// set up our object
+		parent = new Transform();
 		transform = new Transform();
+		transform.Parent = parent;
 		transform.LocalPosition.x = 1;
-		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), Math.PI / 8);
-		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
 
 		// set up rendering and updates
 		System.notifyOnRender(render);
@@ -81,7 +82,8 @@ class MountainLobster {
 	private var angle:Float = 0;
 
 	function update():Void {
-		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), angle);
+		parent.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), angle);
+		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), -angle * 3);
 		angle += Math.PI / 100;
 		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
 	}
