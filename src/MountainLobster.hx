@@ -33,6 +33,8 @@ class MountainLobster {
 			var data:loaders.OgexData = new loaders.OgexData(blob.toString());
 			var go:loaders.OgexData.GeometryObject = data.geometryObjects[0];
 
+			trace(data.getNode("Sun"));
+
 			mesh = new Mesh();
 			mesh.VertexData.push(
 				new VertexDataDescription("position", go.mesh.getArray("position").values)
@@ -46,7 +48,12 @@ class MountainLobster {
 			mesh.buildBuffers();
 
 			// build our material
-			material = new Material("unlit_colour", mesh.getStructures(), Shaders.simple_vert, Shaders.simple_frag);
+			material = new Material("unlit_colour", mesh.getStructures(), Shaders.diffuse_vert, Shaders.diffuse_frag);
+			material.setUniform("lightPos", Float3(0, 2, 2));
+			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+			material.setUniform("P", Mat4(camera.P));
+			material.setUniform("V", Mat4(camera.V));
+			material.setUniform("VP", Mat4(camera.VP));
 
 			trace('Mesh loaded!');
 		});
@@ -65,11 +72,6 @@ class MountainLobster {
 	private var angle:Float = 0;
 
 	function update():Void {
-		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 0, 1), -angle * 3);
-		angle += 0.01;
-		if(material != null) {
-			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
-		}
 	}
 
 	function render(frame:Framebuffer):Void {
