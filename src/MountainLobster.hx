@@ -30,6 +30,7 @@ class MountainLobster {
 	var indexBuffer:IndexBuffer;
 
 	var material:Material;
+	var camera:Camera;
 
 	var mvp:FastMatrix4;
 
@@ -60,16 +61,11 @@ class MountainLobster {
 		material = new Material("unlit_colour", [structure], Shaders.simple_vert, Shaders.simple_frag);
 
 		// set up our camera
-		var p = FastMatrix4.perspectiveProjection(45, 4/3, 0.1, 100);
-		var v = FastMatrix4.lookAt(
-			new FastVector3(4, 3, 3),
-			new FastVector3(0, 0, 0),
-			new FastVector3(0, 1, 0));
+		camera = new Camera(Camera.ProjectionMode.Perspective(60), 0.1, 100, 4/3);
 		var m = FastMatrix4.identity();
 
 		mvp = FastMatrix4.identity();
-		mvp = mvp.multmat(p);
-		mvp = mvp.multmat(v);
+		mvp = mvp.multmat(camera.VP);
 		mvp = mvp.multmat(m);
 
 		material.setUniform("MVP", Mat4(mvp));
