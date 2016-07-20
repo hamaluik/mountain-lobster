@@ -5,6 +5,8 @@ import kha.graphics4.ConstantLocation;
 import kha.graphics4.Usage;
 import kha.math.FastMatrix4;
 import kha.math.FastVector3;
+import kha.math.Quaternion;
+import kha.math.Vector3;
 import kha.Shaders;
 import kha.Framebuffer;
 import kha.graphics4.IndexBuffer;
@@ -31,6 +33,7 @@ class MountainLobster {
 
 	var material:Material;
 	var camera:Camera;
+	var transform:Transform;
 
 	var mvp:FastMatrix4;
 
@@ -64,19 +67,24 @@ class MountainLobster {
 		camera = new Camera(Camera.ProjectionMode.Perspective(60), 0.1, 100, 4/3);
 		var m = FastMatrix4.identity();
 
-		mvp = FastMatrix4.identity();
-		mvp = mvp.multmat(camera.VP);
-		mvp = mvp.multmat(m);
-
-		material.setUniform("MVP", Mat4(mvp));
-		material.setUniform("derp", Bool(false));
+		// set up our object
+		transform = new Transform();
+		transform.LocalPosition.x = 1;
+		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), Math.PI / 8);
+		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
 
 		// set up rendering and updates
 		System.notifyOnRender(render);
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 	}
 
-	function update():Void {}
+	private var angle:Float = 0;
+
+	function update():Void {
+		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 1, 0), angle);
+		angle += Math.PI / 100;
+		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+	}
 
 	function render(frame:Framebuffer):Void {
 		var g = frame.g4;
