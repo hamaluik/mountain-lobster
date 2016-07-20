@@ -5,6 +5,7 @@ import kha.graphics4.ConstantLocation;
 import kha.graphics4.Usage;
 import kha.math.FastMatrix4;
 import kha.math.FastVector3;
+import kha.math.FastVector4;
 import kha.math.Quaternion;
 import kha.math.Vector3;
 import kha.Shaders;
@@ -33,7 +34,15 @@ class MountainLobster {
 			var data:loaders.OgexData = new loaders.OgexData(blob.toString());
 			var go:loaders.OgexData.GeometryObject = data.geometryObjects[0];
 
-			trace(data.getNode("Sun"));
+			var l:Array<Float> = data.getNode("Sun").transform.values;
+			var lm:FastMatrix4 = new FastMatrix4(
+				l[0], l[1], l[2], l[3],
+				l[4], l[5], l[6], l[7],
+				l[8], l[9], l[10], l[11],
+				l[12], l[13], l[14], l[15]);
+			var ldir:FastVector4 = lm.multvec(new FastVector4(0, 0, 1, 0));
+			ldir.normalize();
+			trace(ldir);
 
 			mesh = new Mesh();
 			mesh.VertexData.push(
@@ -49,7 +58,7 @@ class MountainLobster {
 
 			// build our material
 			material = new Material("unlit_colour", mesh.getStructures(), Shaders.diffuse_vert, Shaders.diffuse_frag);
-			material.setUniform("lightPos", Float3(0, 2, 2));
+			material.setUniform("lightPos", Float3(ldir.x, ldir.y, ldir.z));
 			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
 			material.setUniform("P", Mat4(camera.P));
 			material.setUniform("V", Mat4(camera.V));
@@ -69,9 +78,13 @@ class MountainLobster {
 		Scheduler.addTimeTask(update, 0, 1 / 60);
 	}
 
-	private var angle:Float = 0;
+	private var rotQuat:Quaternion = Quaternion.fromAxisAngle(new Vector3(0, 0, 1), -0.01);
 
 	function update():Void {
+		if(material != null) {
+			transform.LocalRotation = transform.LocalRotation.mult(rotQuat);
+			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+		}
 	}
 
 	function render(frame:Framebuffer):Void {

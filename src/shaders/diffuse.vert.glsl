@@ -21,6 +21,6 @@ void kore() {
 	vec3 dir = normalize(lightPos - pos);
 	float d = clamp(dot(norm, dir), 0.0, 1.0);
 	
-	colour = (materialDiffuse * lightColour * d) + (materialDiffuse * 0.1);
+	colour = (materialDiffuse * lightColour * d) + (materialDiffuse * 0.2);
 	gl_Position = MVP * vec4(pos, 1.0);
 }
