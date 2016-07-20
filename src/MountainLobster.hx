@@ -2,6 +2,7 @@ package;
 
 import kha.Assets;
 import kha.graphics4.ConstantLocation;
+import kha.graphics4.Usage;
 import kha.math.FastMatrix4;
 import kha.math.FastVector3;
 import kha.math.Quaternion;
@@ -20,39 +21,41 @@ import kha.Color;
 using Graphics4Tools;
 
 class MountainLobster {
-	var structure:VertexStructure;
+	var structures:Array<VertexStructure>;
 	var material:Material;
 	var camera:Camera;
 	var transform:Transform;
 	var mesh:Mesh;
 
 	public function new() {
-		// set up the vertex structure
-		structure = new VertexStructure();
-		structure.add("pos", VertexData.Float3);
-
 		// load our scene
 		Assets.loadBlob("scene_ogex", function(blob:kha.Blob) {
 			var data:loaders.OgexData = new loaders.OgexData(blob.toString());
 			var go:loaders.OgexData.GeometryObject = data.geometryObjects[0];
-			var vertices:Array<Float> = go.mesh.getArray("position").values;
-			var indices:Array<Int> = go.mesh.indexArray.values;
 
 			mesh = new Mesh();
-			mesh.buildBuffers(vertices, indices, structure);
-		});
+			mesh.VertexData.push(
+				new VertexDataDescription("position", go.mesh.getArray("position").values)
+					.addStructure("pos", VertexData.Float3)
+					.setUsage(Usage.StaticUsage));
+			mesh.VertexData.push(
+				new VertexDataDescription("normal", go.mesh.getArray("normal").values)
+					.addStructure("norm", VertexData.Float3)
+					.setUsage(Usage.StaticUsage));
+			mesh.IndexData = go.mesh.indexArray.values;
+			mesh.buildBuffers();
 
-		// build our material
-		material = new Material("unlit_colour", [structure], Shaders.simple_vert, Shaders.simple_frag);
+			// build our material
+			material = new Material("unlit_colour", mesh.getStructures(), Shaders.simple_vert, Shaders.simple_frag);
+
+			trace('Mesh loaded!');
+		});
 
 		// set up our camera
 		camera = new Camera(Camera.ProjectionMode.Perspective(60), 0.1, 100, 16/9);
 
 		// set up our object
 		transform = new Transform();
-
-		// calculate our MVP
-		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
 
 		// set up rendering and updates
 		System.notifyOnRender(render);
@@ -64,7 +67,9 @@ class MountainLobster {
 	function update():Void {
 		transform.LocalRotation = Quaternion.fromAxisAngle(new Vector3(0, 0, 1), -angle * 3);
 		angle += 0.01;
-		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+		if(material != null) {
+			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+		}
 	}
 
 	function render(frame:Framebuffer):Void {

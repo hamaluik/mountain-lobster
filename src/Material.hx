@@ -1,6 +1,8 @@
 package;
 
 import haxe.ds.StringMap;
+import kha.graphics4.CompareMode;
+import kha.graphics4.CullMode;
 import kha.graphics4.FragmentShader;
 import kha.graphics4.Graphics;
 import kha.graphics4.PipelineState;
@@ -22,6 +24,9 @@ class Material {
 		Pipeline.inputLayout = inputLayout;
 		Pipeline.vertexShader = vertexShader;
 		Pipeline.fragmentShader = fragmentShader;
+		Pipeline.depthWrite = true;
+		Pipeline.depthMode = CompareMode.Less;
+		Pipeline.cullMode = CullMode.CounterClockwise;
 		Pipeline.compile();
 
 		Uniforms = new StringMap<Uniform>();
