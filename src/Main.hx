@@ -6,7 +6,7 @@ class Main {
 	public static function main() {
 		System.init({
 			title: "Mountain Lobster",
-			width: 800, height: 600
+			width: 960, height: 540
 		}, function() {
 			new MountainLobster();
 		});

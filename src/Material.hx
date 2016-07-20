@@ -69,10 +69,6 @@ class Material {
 		}
 	}
 
-	public static function use(g:Graphics, m:Material) {
-		m.setup(g);
-	}
-
 	public function toString() {
 		return haxe.Json.stringify({
 			name: Name,

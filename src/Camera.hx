@@ -32,7 +32,7 @@ class Camera {
 	public function get_V():FastMatrix4 {
 		if(_vDirty) {
 			// TODO: set _v!
-			_v = FastMatrix4.lookAt(new FastVector3(4, 3, 3), new FastVector3(0, 0, 0), new FastVector3(0, 1, 0));
+			_v = FastMatrix4.lookAt(new FastVector3(3, 3, 3), new FastVector3(0, 0, 0), new FastVector3(0, 0, 1));
 			_vDirty = false;
 		}
 		return _v;
