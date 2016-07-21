@@ -7,8 +7,8 @@ precision mediump float;
 attribute vec3 pos;
 attribute vec3 norm;
 
-uniform vec3 lightPos;
-uniform mat4 MVP;
+uniform vec3 sunDir;
+uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
@@ -18,9 +18,8 @@ const vec3 materialDiffuse = vec3(0.8, 0.8, 0.8);
 const vec3 lightColour = vec3(0.8, 0.8, 0.8);
 
 void kore() {
-	vec3 dir = normalize(lightPos - pos);
-	float d = clamp(dot(norm, dir), 0.0, 1.0);
+	float dSun = clamp(dot(norm, (V * vec4(sunDir, 0.0)).xyz), 0.0, 1.0);
 	
-	colour = (materialDiffuse * lightColour * d) + (materialDiffuse * 0.2);
-	gl_Position = MVP * vec4(pos, 1.0);
+	colour = (materialDiffuse * lightColour * dSun) + (materialDiffuse * 0.2);
+	gl_Position = (P * V * M) * vec4(pos, 1.0);
 }

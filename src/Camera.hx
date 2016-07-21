@@ -26,13 +26,14 @@ class Camera {
 		return _p;
 	}
 
+	public var transform:Transform = new Transform();
 	private var _v:FastMatrix4;
 	private var _vDirty:Bool = true;
 	public var V(get, never):FastMatrix4;
 	public function get_V():FastMatrix4 {
 		if(_vDirty) {
-			// TODO: set _v!
-			_v = FastMatrix4.lookAt(new FastVector3(3, -3, 3), new FastVector3(0, 0, 0), new FastVector3(0, 0, 1));
+			//_v = transform.M.inverse();
+			_v = FastMatrix4.lookAt(new FastVector3(0, -3, 0), new FastVector3(0, 0, 0), new FastVector3(0, 0, 1));
 			_vDirty = false;
 		}
 		return _v;
