@@ -32,8 +32,8 @@ class Camera {
 	public var V(get, never):FastMatrix4;
 	public function get_V():FastMatrix4 {
 		if(_vDirty) {
-			//_v = transform.M.inverse();
-			_v = FastMatrix4.lookAt(new FastVector3(0, -3, 0), new FastVector3(0, 0, 0), new FastVector3(0, 0, 1));
+			_v = transform.M.inverse();
+			//_v = FastMatrix4.lookAt(new FastVector3(0, -3, 0), new FastVector3(0, 0, 0), new FastVector3(0, 0, 1));
 			_vDirty = false;
 		}
 		return _v;

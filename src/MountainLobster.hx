@@ -18,6 +18,7 @@ import kha.graphics4.VertexStructure;
 import kha.Scheduler;
 import kha.System;
 import kha.Color;
+import zui.Zui;
 
 using Graphics4Tools;
 
@@ -28,6 +29,8 @@ class MountainLobster {
 	var transform:Transform;
 	var mesh:Mesh;
 
+	var ui:Zui;
+
 	public function new() {
 		// load our scene
 		Assets.loadBlob("scene_ogex", function(blob:kha.Blob) {
@@ -36,12 +39,12 @@ class MountainLobster {
 
 			// set up our light
 			var lT:Array<Float> = data.getNode("Sun").transform.values;
-			var lightTransform = Transform.fromLocalMat4(new FastMatrix4(
+			var sunTransform = Transform.fromLocalMat4(new FastMatrix4(
 				lT[0], lT[1], lT[2], lT[3],
 				lT[4], lT[5], lT[6], lT[7],
 				lT[8], lT[9], lT[10], lT[11],
 				lT[12], lT[13], lT[14], lT[15]));
-			var sunDir:FastVector4 = lightTransform.M.multvec(new FastVector4(0, 0, 1, 0));
+			var sunDir:FastVector4 = sunTransform.M.multvec(new FastVector4(0, 0, 1, 0));
 
 			// set up our camera
 			var cT:Array<Float> = data.getNode("Camera").transform.values;
@@ -50,7 +53,6 @@ class MountainLobster {
 				cT[4], cT[5], cT[6], cT[7],
 				cT[8], cT[9], cT[10], cT[11],
 				cT[12], cT[13], cT[14], cT[15]));
-
 			var camObj:loaders.OgexData.CameraObject = data.getCameraObject(data.getNode("Camera").objectRefs[0]);
 			var fov:Float = 60, near:Float = 0.1, far:Float = 100;
 			for(param in camObj.params) {
@@ -97,7 +99,10 @@ class MountainLobster {
 
 	function update():Void {
 		if(material != null && camera != null) {
-			transform.LocalRotation = transform.LocalRotation.mult(rotQuat);
+			//transform.LocalRotation = transform.LocalRotation.mult(rotQuat);
+			transform.LocalRotation = transform.LocalRotation.multmat(FastMatrix4.fromMatrix4(rotQuat.matrix()));
+			material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
+			material.setUniform("VP", Mat4(camera.VP));
 			material.setUniform("M", Mat4(transform.M));
 			material.setUniform("V", Mat4(camera.V));
 			material.setUniform("P", Mat4(camera.P));

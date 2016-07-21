@@ -7,7 +7,10 @@ project.windowOptions = {
 
 project.addSources('src');
 
+project.addLibrary("glm");
+project.addLibrary("zui");
+
 project.addShaders('src/shaders/**');
 project.addAssets('assets/**');
 
-return project;
+return project;haxe
