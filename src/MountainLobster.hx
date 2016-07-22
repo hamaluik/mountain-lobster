@@ -1,5 +1,7 @@
 package;
 
+import glm.Mat4;
+import glm.Vec3;
 import kha.Assets;
 import kha.graphics4.ConstantLocation;
 import kha.graphics4.Usage;
@@ -21,6 +23,7 @@ import zui.Zui;
 
 using Graphics4Tools;
 using zui.Ext;
+using GLMTools;
 
 class MountainLobster {
 	var initialized:Bool = false;
@@ -32,6 +35,8 @@ class MountainLobster {
 	var mesh:Mesh;
 
 	var ui:Zui;
+
+	var derp:Mat4 = Mat4.identity();
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
@@ -48,7 +53,8 @@ class MountainLobster {
 			lT[4], lT[5], lT[6], lT[7],
 			lT[8], lT[9], lT[10], lT[11],
 			lT[12], lT[13], lT[14], lT[15]));
-		var sunDir:FastVector4 = sunTransform.M.multvec(new FastVector4(0, 0, 1, 0));
+		var sunDirF:FastVector4 = sunTransform.M.multvec(new FastVector4(0, 0, 1, 0));
+		var sunDir:Vec3 = new Vec3(sunDirF.x, sunDirF.y, sunDirF.z);
 
 		// set up our camera
 		var cT:Array<Float> = data.getNode("Camera").transform.values;
@@ -83,10 +89,9 @@ class MountainLobster {
 
 		// build our material
 		material = new Material("unlit_colour", mesh.getStructures(), Shaders.diffuse_vert, Shaders.diffuse_frag);
-		material.setUniform("sunDir", Float3(sunDir.x, sunDir.y, sunDir.z));
+		material.setUniform("sunDir", Vec3(sunDir));
 		material.setUniform("sunColour", Float3(1.0, 1.0, 1.0));
 		material.setUniform("ambientColour", Float3(0.0, 0.0, 0.0));
-		material.setUniform("diffuseColour", Float3(0.8, 0.8, 0.8));
 
 		// load  our transform
 		var sT:Array<Float> = data.getNode("Suzanne").transform.values;
@@ -104,8 +109,7 @@ class MountainLobster {
 	}
 
 	private var rotation:Float = 0;
-	private var diffuseColour:Int = 0;
-	private var dc:Color = Color.White;
+	private var diffuseColour:Color = Color.White;
 
 	public function update():Void {
 		if(!initialized) return;
@@ -114,15 +118,11 @@ class MountainLobster {
 		transform.LocalRotation = FastMatrix4.rotationZ(rotation * Math.PI / 180);
 
 		// camera setup
-		material.setUniform("MVP", Mat4(transform.MVP(camera.VP)));
-		material.setUniform("VP", Mat4(camera.VP));
-		material.setUniform("M", Mat4(transform.M));
-		material.setUniform("V", Mat4(camera.V));
-		material.setUniform("P", Mat4(camera.P));
-
-		// material properties
-		dc = Color.fromValue(diffuseColour);
-		material.setUniform("diffuseColour", RGB(dc));
+		material.setUniform("MVP", Matrix4(transform.MVP(camera.VP)));
+		material.setUniform("VP", Matrix4(camera.VP));
+		material.setUniform("M", Matrix4(transform.M));
+		material.setUniform("V", Matrix4(camera.V));
+		material.setUniform("P", Matrix4(camera.P));
 	}
 
 	public function render(frame:Framebuffer):Void {
@@ -144,7 +144,14 @@ class MountainLobster {
 				if (ui.node(Id.node(), "Diffuse Colour", 0, true)) {
 					ui.indent();
 					ui.separator();
-					diffuseColour = ui.colorPicker(Id.colorPicker(), false, diffuseColour);
+					
+					// colour sliders
+					diffuseColour.R = ui.slider(Id.slider(), "R", 0, 1, true, null, diffuseColour.R);
+					diffuseColour.G = ui.slider(Id.slider(), "G", 0, 1, true, null, diffuseColour.G);
+					diffuseColour.B = ui.slider(Id.slider(), "B", 0, 1, true, null, diffuseColour.B);
+					ui.text("", Zui.ALIGN_RIGHT, diffuseColour);
+
+					material.setUniform("diffuseColour", RGB(diffuseColour));
 					ui.unindent();
 				}
 			}

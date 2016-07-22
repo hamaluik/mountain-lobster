@@ -1,5 +1,11 @@
 package;
 
+import glm.Mat3;
+import glm.Mat4;
+import glm.Quat;
+import glm.Vec2;
+import glm.Vec3;
+import glm.Vec4;
 import haxe.ds.Vector;
 import kha.Color;
 import kha.FastFloat;
@@ -17,10 +23,16 @@ enum TUniform {
 	Float3(x:FastFloat, y:FastFloat, z:FastFloat);
 	Float4(x:FastFloat, y:FastFloat, z:FastFloat, w:FastFloat);
 	Floats(x:Vector<FastFloat>);
-	Vec2(x:FastVector2);
-	Vec3(x:FastVector3);
-	Vec4(x:FastVector4);
-	Mat4(v:FastMatrix4);
+	Vector2(x:FastVector2);
+	Vector3(x:FastVector3);
+	Vector4(x:FastVector4);
+	Matrix4(v:FastMatrix4);
+	Vec2(x:Vec2);
+	Vec3(x:Vec3);
+	Vec4(x:Vec4);
+	Mat3(v:Mat3);
+	Mat4(v:Mat4);
+	Quat(q:Quat);
 	RGB(c:Color);
 	RGBA(c:Color);
 }
