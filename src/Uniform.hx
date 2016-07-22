@@ -1,6 +1,7 @@
 package;
 
 import haxe.ds.Vector;
+import kha.Color;
 import kha.FastFloat;
 import kha.graphics4.ConstantLocation;
 import kha.math.FastMatrix4;
@@ -20,6 +21,8 @@ enum TUniform {
 	Vec3(x:FastVector3);
 	Vec4(x:FastVector4);
 	Mat4(v:FastMatrix4);
+	RGB(c:Color);
+	RGBA(c:Color);
 }
 
 class Uniform {

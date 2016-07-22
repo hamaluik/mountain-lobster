@@ -20,6 +20,7 @@ import zui.Id;
 import zui.Zui;
 
 using Graphics4Tools;
+using zui.Ext;
 
 class MountainLobster {
 	var initialized:Bool = false;
@@ -83,6 +84,9 @@ class MountainLobster {
 		// build our material
 		material = new Material("unlit_colour", mesh.getStructures(), Shaders.diffuse_vert, Shaders.diffuse_frag);
 		material.setUniform("sunDir", Float3(sunDir.x, sunDir.y, sunDir.z));
+		material.setUniform("sunColour", Float3(1.0, 1.0, 1.0));
+		material.setUniform("ambientColour", Float3(0.0, 0.0, 0.0));
+		material.setUniform("diffuseColour", Float3(0.8, 0.8, 0.8));
 
 		// load  our transform
 		var sT:Array<Float> = data.getNode("Suzanne").transform.values;
@@ -93,13 +97,15 @@ class MountainLobster {
 			sT[12], sT[13], sT[14], sT[15]));
 
 		// load our UI
-		ui = new Zui(Assets.fonts.DroidSans, 20, 14, 0, 1.5);
+		ui = new Zui(Assets.fonts.DroidSans, 16);
 
 		// ready to rock!
 		initialized = true;
 	}
 
 	private var rotation:Float = 0;
+	private var diffuseColour:Int = 0;
+	private var dc:Color = Color.White;
 
 	public function update():Void {
 		if(!initialized) return;
@@ -113,6 +119,10 @@ class MountainLobster {
 		material.setUniform("M", Mat4(transform.M));
 		material.setUniform("V", Mat4(camera.V));
 		material.setUniform("P", Mat4(camera.P));
+
+		// material properties
+		dc = Color.fromValue(diffuseColour);
+		material.setUniform("diffuseColour", RGB(dc));
 	}
 
 	public function render(frame:Framebuffer):Void {
@@ -128,8 +138,15 @@ class MountainLobster {
 		g.end();
 
 		ui.begin(frame.g2);
-			if(ui.window(Id.window(), 10, 10, 100, 100)) {
+			if(ui.window(Id.window(), 0, 0, 200, kha.System.windowHeight())) {
 				rotation = ui.slider(Id.slider(), "Rotation", 0, 360, false, 1, rotation);
+
+				if (ui.node(Id.node(), "Diffuse Colour", 0, true)) {
+					ui.indent();
+					ui.separator();
+					diffuseColour = ui.colorPicker(Id.colorPicker(), false, diffuseColour);
+					ui.unindent();
+				}
 			}
 		ui.end();
 	}

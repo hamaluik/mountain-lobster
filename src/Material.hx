@@ -69,6 +69,8 @@ class Material {
 				case Vec3(x): g.setVector3(uniform.Location, x);
 				case Vec4(x): g.setVector4(uniform.Location, x);
 				case Mat4(m): g.setMatrix(uniform.Location, m);
+				case RGB(c): g.setFloat3(uniform.Location, c.R, c.G, c.B);
+				case RGBA(c): g.setFloat4(uniform.Location, c.R, c.G, c.B, c.A);
 				case _: throw 'Unhandled uniform type ${uniform.Value}!';
 			}
 		}
